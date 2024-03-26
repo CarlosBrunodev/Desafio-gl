@@ -1,4 +1,3 @@
-# Usa a imagem oficial do Python 3.7.4 como base
 FROM python:3.7.4-slim
 
 WORKDIR /app
