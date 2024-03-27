@@ -1,0 +1,111 @@
+---
+- name: Configuração de maquinas para kubernetes
+  hosts: dev-app
+  remote_user: root
+
+  tasks:
+    - name: Iniciando processo de configuracao.
+      ansible.builtin.debug:
+       msg: Iniciando configuração dos hosts.
+
+    - name: Atualizando pacotes de sistema
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
+        cache_valid_time: 3600
+
+    - name: Instalando pacotes necessarios
+      ansible.builtin.apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - software-properties-common
+
+    - name: Definindo '1' for net brigde
+      ansible.builtin.shell: echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
+          
+    - name: Desabilitando SWAP de memoria - a versao atual de kubernetes nao trabalha com o swap habilitado.
+      ansible.builtin.shell:  /usr/sbin/swapoff -a
+
+    - name: Desabilitando firewall.
+      ansible.builtin.shell:  ufw disable
+
+    - name: Atualizando configurações de sysctl para rede Kubernetes
+      ansible.builtin.shell: |
+        cat >>/etc/sysctl.d/kubernetes.conf<<EOF
+        net.bridge.bridge-nf-call-ip6tables = 1
+        net.bridge.bridge-nf-call-iptables = 1
+        EOF
+        sysctl --system
+
+    - name: Criando diretorio para Docker's GPG key
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker's official GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        keyring: /etc/apt/keyrings/docker.gpg
+        state: present
+
+    - name: Printando informacoes de arquitetura
+      ansible.builtin.debug:
+        msg: "Architecture: {{ ansible_architecture }}, Codename: {{ ansible_lsb.codename }}"
+
+    - name: Adicionando repositorio Docker
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch={{ arch_mapping[ansible_architecture] | default(ansible_architecture) }}
+          signed-by=/etc/apt/keyrings/docker.gpg]
+          https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+        filename: docker
+        state: present
+
+    - name: Instalando Docker
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+
+    - name: Adicioanando Docker group
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Adicionando usuario ao grupo Docker
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+
+    - name: Startando servico Docker
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - docker.service
+        - containerd.service
+    
+    - name: Instalando Helm 
+      ansible.builtin.shell: |
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+    
+    - name: Instalando rke
+      ansible.builtin.shell: |
+        wget https://github.com/rancher/rke/releases/download/v1.5.6/rke_linux-arm64
+        mv rke_linux-arm64 /usr/local/bin/rke
+        chmod +x /usr/local/bin/rke
+
