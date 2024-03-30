@@ -12,7 +12,7 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID}}
-  SSH_KEY: ${{ secrets.SSH_KEY}}
+  SSH_KEYS: ${{ secrets.SSH_KEYS}}
 
 jobs:
   terraform:
@@ -25,17 +25,17 @@ jobs:
     - name: Check if devtfvars exists
       run: |
         # Verifique se a variável SSH_KEY está definida
-        if [ -n "$SSH_KEY" ]; then
+        if [ -n "$SSH_KEYS" ]; then
           # Crie o diretório .ssh se ainda não existir
           mkdir -p ~/.ssh
           
           # Escreva o conteúdo da variável SSH_KEY no arquivo ~/.ssh/id_rsa.pub
-          echo "$SSH_KEY" > ~/.ssh/id_rsa.pub
+          echo "$SSH_KEYS" > ~/.ssh/id_rsa.pub
           
           # Defina as permissões corretas no arquivo ~/.ssh/id_rsa.pub
           chmod 600 ~/.ssh/id_rsa.pub
         else
-          echo "SSH_KEY não está definida. Não foi possível escrever no arquivo ~/.ssh/id_rsa.pub."
+          echo "SSH_KEYS não está definida. Não foi possível escrever no arquivo ~/.ssh/id_rsa.pub."
         fi
        
     - name: AZ login
