@@ -6,11 +6,6 @@ on:
     # paths:
     #   - 'terraform/vm/dev.tfvars'
 
-permissions:
-  id-token: write
-  contents: read
-  issues: write
-
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -26,11 +21,18 @@ jobs:
     #       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
     #       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-        enable-AzPSSession: true
+    # - uses: azure/login@v1
+    #   with:
+    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+    #     enable-AzPSSession: true
 
+    - name: AZ login
+      uses: azure/CLI@v1
+      with:
+          azcliversion: latest
+          inlineScript: |
+            az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET" }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+    
     - name: Check if devtfvars exists
       run: |
         if [ ! -f "terraform/vm/dev.tfvars" ]; then
