@@ -50,7 +50,7 @@ jobs:
       run: terraform init
 
     - name: Terraform Plan
-      working-directory: /terraform/vm
+      working-directory: ./terraform/vm
       run: terraform plan -var-file=dev.tfvars
 
     - name: Terraform Apply
