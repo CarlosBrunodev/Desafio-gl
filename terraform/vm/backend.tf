@@ -18,7 +18,7 @@ terraform {
 
   backend "azurerm" {
     resource_group_name  = "dev-app-rg"
-    storage_account_name = "devappaccount"
+    storage_account_name = "devappaccountcb"
     container_name       = "terraformstate"
     key                  = "terraform/autopilot/teste-vm/state"
   }
