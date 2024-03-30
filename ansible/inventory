@@ -1,8 +1,5 @@
 [dev-app]
-13.88.190.115 ansible_connection=ssh ansible_user=adminuser
-13.88.190.114 ansible_connection=ssh ansible_user=adminuser
+13.88.190.115 ansible_connection=ssh ansible_user=adminuser host_key_checking=False
+13.88.190.114 ansible_connection=ssh ansible_user=adminuser host_key_checking=False
 
-
-[defaults]
-host_key_checking = False
 
