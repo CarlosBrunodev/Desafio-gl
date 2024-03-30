@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - '/terraform/vm/dev.tfvars'
+      - 'terraform/vm/dev.tfvars'
 
 jobs:
   terraform:
