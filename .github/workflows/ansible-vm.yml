@@ -1,0 +1,37 @@
+name: Configuracao de maquinas com ansible
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - './ansible/inventory'
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  SSH_KEY: ${{ secrets.SSH_KEY }}
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Copy SSH_KEY.
+      run: |
+        if [ -n "$SSH_KEY" ]; then
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa.pub
+        else
+          echo "SSH_KEY não está definida. Não foi possível escrever no arquivo ~/.ssh/id_rsa.pub."
+        fi
+
+    - name: Run Ansible playbook
+      working-directory: ./ansible
+      run: |
+        ansible-playbook -i inventory config-host.yaml
