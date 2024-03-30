@@ -1,10 +1,10 @@
-name: Configuracao de maquinas com ansible
+name: Ansible config new hosts
 
 on:
   push:
     branches: [ "main" ]
-    # paths:
-    #   - './ansible/inventory'
+    paths:
+      - 'ansible/inventory'
 
 env:
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
