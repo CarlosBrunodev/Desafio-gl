@@ -16,7 +16,7 @@ provider "rke" {
 }
 
 
-resource "rke_cluster" "foo2" {
+resource "rke_cluster" "cluster" {
   nodes {
     address = "13.88.190.115"
     user    = "adminuser"
