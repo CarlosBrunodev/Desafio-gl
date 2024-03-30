@@ -3,8 +3,8 @@ name: Configuracao de maquinas com ansible
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - './ansible/inventory'
+    # paths:
+    #   - './ansible/inventory'
 
 env:
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
