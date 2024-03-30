@@ -1,0 +1,42 @@
+name: Terraform Azure Deploy
+
+on:
+  push:
+    paths:
+      - '/terraform/vm/devtfvars'
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Check if devtfvars exists
+      run: |
+        if [ ! -f "/terraform/vm/dev.tfvars" ]; then
+          echo "File devtfvars not found. Exiting..."
+          exit 1
+        fi
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+
+    - name: Initialize Terraform
+      run: terraform init
+
+    - name: Terraform Plan
+      run: terraform plan -var-file=/terraform/vm/devtfvars
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Customize this condition based on your branch naming convention
+      run: terraform apply -auto-approve -var-file=/terraform/vm/devtfvars
