@@ -5,7 +5,7 @@ variable "resource_group_name" {
 
 variable "storage_account" {
   type    = string
-  default = "devappaccount"
+  default = "devappaccountcb"
 }
 
 variable "default_location" {
@@ -13,7 +13,7 @@ variable "default_location" {
   default = "West US"
 }
 
-variable "name_storage_contianer" {
+variable "name_storage_container" {
   type    = string
   default = "terraformstate"
 }

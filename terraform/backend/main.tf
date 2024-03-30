@@ -44,7 +44,7 @@ resource "azurerm_storage_account" "dev-ac" {
 }
 
 resource "azurerm_storage_container" "dev-contianer" {
-  name                  = var.name_storage_contianer
+  name                  = var.name_storage_container
   storage_account_name  = var.storage_account
   container_access_type = var.container_type
 

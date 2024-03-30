@@ -1,6 +1,6 @@
 resource_group_name    = "dev-app-rg"
 default_location       = "West US"
-storage_account        = "devappaccount"
+storage_account        = "devappaccountcb"
 name_storage_contianer = "terraformstate"
 container_type         = "private"
 https_traffic_account  = true
