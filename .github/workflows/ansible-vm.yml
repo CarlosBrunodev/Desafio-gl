@@ -7,10 +7,6 @@ on:
       - 'ansible/inventory'
 
 env:
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   SSH_KEY: ${{ secrets.SSH_KEY }}
   SSH_KEY_INFO: ${{ secrets.SSH_KEY_INFO }}
 
@@ -34,6 +30,9 @@ jobs:
           echo "SSH_KEY não está definida. Não foi possível escrever no arquivo ~/.ssh/id_rsa.pub"
         fi
 
+    - name: Copy SSH_KEY.
+      run: export ANSIBLE_HOST_KEY_CHECKING=False
+      
     - name: Run Ansible playbook
       working-directory: ./ansible
       run: |
