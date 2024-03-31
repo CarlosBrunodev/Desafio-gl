@@ -1,3 +1,8 @@
+# provider "azurerm" {
+#   features {}
+
+#   subscription_id = "9317fcc6-c07b-498e-bcc2-9bb771806102"
+# }
 data "template_file" "linux-vm-cloud-init" {
   template = file("bootstrap.sh")
 }
@@ -20,10 +25,10 @@ resource "azurerm_subnet" "internal" {
 }
 
 resource "azurerm_public_ip" "example" {
-  count                = var.count-net
+  count               = var.count-net
   name                = "${var.vnet-name}-public-ip-${count.index}"
   location            = var.location
-  resource_group_name  = var.resource-group-name
+  resource_group_name = var.resource-group-name
   allocation_method   = var.allocation
 }
 
@@ -44,13 +49,13 @@ resource "azurerm_network_interface" "main" {
 ## Vm linux
 
 resource "azurerm_linux_virtual_machine" "example" {
-  count = 2
-  name                  = "${var.vm-name}-vm-${count.index}"
-  location              = var.location
-  resource_group_name   = var.resource-group-name
-  size                  = var.vm-size
+  count               = 2
+  name                = "${var.vm-name}-vm-${count.index}"
+  location            = var.location
+  resource_group_name = var.resource-group-name
+  size                = var.vm-size
   admin_username      = var.vm-admin-username
- # custom_data = base64encode(data.template_file.linux-vm-cloud-init.rendered)
+  # custom_data = base64encode(data.template_file.linux-vm-cloud-init.rendered)
   network_interface_ids = [
     azurerm_network_interface.main[count.index].id
   ]

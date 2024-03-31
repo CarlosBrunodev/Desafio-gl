@@ -1,7 +1,7 @@
 ## Network var
 
 variable "count-net" {
-  type = number
+  type    = number
   default = 2
 }
 
@@ -11,7 +11,7 @@ variable "vnet-name" {
 }
 
 variable "address" {
-  type    = list
+  type    = list(any)
   default = ["10.0.0.0/16"]
 }
 
@@ -21,22 +21,22 @@ variable "location" {
 }
 
 variable "resource-group-name" {
-    type  = string
-    default = "dev-app-rg"
+  type    = string
+  default = "dev-app-rg"
 }
 
 variable "allocation" {
-    type  = string
-    default = "Static"
+  type    = string
+  default = "Static"
 }
 
 variable "ip-config-name" {
-    type  = string
-    default = "testconfiguration1"
+  type    = string
+  default = "testconfiguration1"
 }
 
 variable "private_ip_address_allocation" {
-  type = string
+  type    = string
   default = "Dynamic"
 }
 

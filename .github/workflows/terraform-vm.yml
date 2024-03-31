@@ -6,7 +6,6 @@ on:
     paths:
       - './terraform/vm/dev.tfvars'
 
-
 env:
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -62,5 +61,5 @@ jobs:
 
     - name: Terraform Apply
       working-directory: ./terraform/vm
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Customize this condition based on your branch naming convention
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push' 
       run: terraform apply -auto-approve -var-file=dev.tfvars

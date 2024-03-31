@@ -1,5 +1,5 @@
 [dev-app]
-13.88.190.115 ansible_connection=ssh ansible_user=adminuser ansible_ssh_common_args='-o StrictHostKeyChecking=no'
-13.88.190.114 ansible_connection=ssh ansible_user=adminuser ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+0.0.0.0 ansible_connection=ssh ansible_user=adminuser ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+0.0.0.0 ansible_connection=ssh ansible_user=adminuser ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 

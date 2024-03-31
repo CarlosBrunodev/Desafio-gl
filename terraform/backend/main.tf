@@ -51,9 +51,7 @@ resource "azurerm_storage_container" "dev-contianer" {
   container_access_type = var.container_type
 
   depends_on = [
-    azurerm_storage_account.dev-ac,  
+    azurerm_storage_account.dev-ac,
     azurerm_resource_group.dev-rg
   ]
-
-
 }

@@ -5,7 +5,7 @@ terraform {
 
   required_providers {
     rke = {
-      source = "rancher/rke"
+      source  = "rancher/rke"
       version = "1.4.4"
     }
   }
@@ -18,20 +18,20 @@ provider "rke" {
 
 resource "rke_cluster" "cluster" {
   nodes {
-    address = "13.88.190.115"
+    address = "0.0.0.0"
     user    = "adminuser"
     role    = ["controlplane", "worker", "etcd"]
     ssh_key = file("~/.ssh/id_rsa")
   }
   nodes {
-    address = "13.88.190.114"
+    address = "0.0.0.0"
     user    = "adminuser"
     role    = ["controlplane", "worker", "etcd"]
     ssh_key = file("~/.ssh/id_rsa")
   }
   upgrade_strategy {
-      drain = true
-      max_unavailable_worker = "20%"
+    drain                  = true
+    max_unavailable_worker = "20%"
   }
 
   enable_cri_dockerd = true

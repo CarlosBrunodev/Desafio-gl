@@ -1,0 +1,35 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app-comments-chart/values.yaml'
+
+env:
+  VERSION_APP: ${{ VARIABLES.VERSION_APP}}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up kubectl
+      uses: azure/k8s-set-context@v1
+      with:
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        version: 'v1.21.0'
+
+    - name: Install Helm
+      uses: azure/setup-helm@v1
+
+    # - name: Replace image tag in values.yaml
+    #   run: "sed -i '' 's/tag: 1.2/tag: $VERSION_APP/g' values.yaml"
+
+    - name: Apply Helm chart
+      run: |
+        helm upgrade -i my-app -n my-app ./app-comments-chart -f ./app-comments-chart/values.yaml

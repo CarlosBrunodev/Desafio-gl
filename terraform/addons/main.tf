@@ -8,17 +8,14 @@ terraform {
   backend "local" {
     path = "relative/path/to/terraform.tfstate"
   }
-  
+
 }
 
-
-
 provider "helm" {
-   kubernetes {
+  kubernetes {
     config_path = "~/.kube/config"
   }
 }
-
 
 resource "helm_release" "cert_manager" {
   name = "cert-manager"
@@ -33,27 +30,27 @@ resource "helm_release" "cert_manager" {
 resource "helm_release" "rancher" {
   name = "rancher"
 
-  repository       = "rancher-latest"
-  chart            = "rancher"
-  namespace        = "cattle-system"
+  repository = "rancher-latest"
+  chart      = "rancher"
+  namespace  = "cattle-system"
   set {
     name  = "hostname"
     value = "rancher.my.org"
     type  = "string"
-}
+  }
 
-set {
+  set {
     name  = "ingress.tls.source"
     value = "letsEncrypt"
     type  = "string"
-}
+  }
 
-set {
+  set {
     name  = "letsEncrypt.email"
     value = "me@example.org"
     type  = "string"
-}
-values = [
+  }
+  values = [
     "${file("values.yaml")}"
   ]
 }
