@@ -1,0 +1,221 @@
+global:
+  rbac:
+    create: true
+
+alertmanager:
+
+  ## Deploy alertmanager
+  ##
+  enabled: true
+
+  ## Alertmanager configuration directives
+  ## ref: https://prometheus.io/docs/alerting/configuration/#configuration-file
+  ##      https://prometheus.io/webtools/alerting/routing-tree-editor/
+  ##
+  config:
+    global:
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'carlosbruno.dev@gmail.com'
+      smtp_auth_identity: 'carlosbruno.dev@gmail.com'
+      smtp_require_tls: true
+      resolve_timeout: 5m
+    inhibit_rules:
+      - source_matchers:
+          - 'severity = critical'
+        target_matchers:
+          - 'severity =~ warning|info'
+        equal:
+          - 'namespace'
+          - 'alertname'
+      - source_matchers:
+          - 'severity = warning'
+        target_matchers:
+          - 'severity = info'
+        equal:
+          - 'namespace'
+          - 'alertname'
+      - source_matchers:
+          - 'alertname = InfoInhibitor'
+        target_matchers:
+          - 'severity = info'
+        equal:
+          - 'namespace'
+      - target_matchers:
+          - 'alertname = InfoInhibitor'
+    route:
+      receiver: 'email-default'
+      routes:
+        - match:
+            severity: critical
+          receiver: email-default
+        - match:
+            severity: warning
+          receiver: email-default
+        - match:
+            severity: info
+          receiver: email-default
+      # group_by: [ alertname ]
+      repeat_interval: 30s
+      group_wait: 15s
+      group_interval: 15s
+
+    receivers:
+      - name: 'email-default'
+        email_configs:
+          - smarthost: 'smtp.gmail.com:587'
+            auth_username: 'carlosbruno.dev@gmail.com'
+            auth_password: "******"
+            require_tls: true
+            from: 'carlosbruno.dev@gmail.com'
+            to: 'carlosbruno.dev@gmail.com'
+            headers:
+              subject: 'Prometheus Mail Alerts'
+
+    templates:
+    - '/etc/alertmanager/config/*.tmpl'
+
+  ingress:
+    enabled: true
+
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    ingressClassName: external-nginx
+
+    annotations: 
+      cert-manager.io/cluster-issuer: letsencrypt
+
+    labels: {}
+
+    ## Override ingress to a different defined port on the service
+    # servicePort: 8081
+    ## Override ingress to a different service then the default, this is useful if you need to
+    ## point to a specific instance of the alertmanager (eg kube-prometheus-stack-alertmanager-0)
+    # serviceName: kube-prometheus-stack-alertmanager-0
+
+    ## Hosts must be provided if Ingress is enabled.
+    ##
+    hosts: 
+      - alertmanager.com.br
+
+    ## Paths to use for ingress rules - one path should match the alertmanagerSpec.routePrefix
+    ##
+    paths: 
+    - /
+
+    ## For Kubernetes >= 1.18 you should specify the pathType (determines how Ingress paths should be matched)
+    ## See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#better-path-matching-with-path-types
+    # pathType: ImplementationSpecific
+
+    ## TLS configuration for Alertmanager Ingress
+    ## Secret must be manually created in the namespace
+    ##
+    tls: 
+    - secretName: alertmanager-tls
+      hosts:
+      - alertmanager.com.br
+
+
+grafana:
+  enabled: true
+
+  adminPassword: prom-operator
+
+  rbac:
+    ## If true, Grafana PSPs will be created
+    ##
+    pspEnabled: false
+
+  ingress:
+    ## If true, Grafana Ingress will be created
+    ##
+    enabled: true
+
+    ## IngressClassName for Grafana Ingress.
+    ## Should be provided if Ingress is enable.
+    ##
+    ingressClassName: external-nginx
+
+    ## Annotations for Grafana Ingress
+    ##
+    annotations: 
+      cert-manager.io/cluster-issuer: letsencrypt
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+
+    ## Labels to be added to the Ingress
+    ##
+    labels: {}
+
+    ## Hostnames.
+    ## Must be provided if Ingress is enable.
+    ##
+    # hosts:
+    #   - grafana.domain.com
+    hosts: 
+     - grafana.com.br
+
+    ## Path for grafana ingress
+    path: /
+
+    ## TLS configuration for grafana Ingress
+    ## Secret must be manually created in the namespace
+    ##
+    tls: 
+    - secretName: grafana-tls
+      hosts:
+      - grafana.com.br
+
+
+
+    #   port: 8082
+    #   targetPort: 8082
+
+prometheus:
+  ingress:
+    enabled: true 
+
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    ingressClassName: external-nginx
+
+    annotations: 
+      cert-manager.io/cluster-issuer: letsencrypt
+    labels: {}
+
+    ## Redirect ingress to an additional defined port on the service
+    # servicePort: 8081
+
+    ## Hostnames.
+    ## Must be provided if Ingress is enabled.
+    ##
+    # hosts:
+    #   - prometheus.domain.com
+    hosts: 
+      - prometheus.com.br
+
+    ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
+    ##
+    paths: 
+     - /
+
+    ## For Kubernetes >= 1.18 you should specify the pathType (determines how Ingress paths should be matched)
+    ## See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#better-path-matching-with-path-types
+    # pathType: ImplementationSpecific
+
+    ## TLS configuration for Prometheus Ingress
+    ## Secret must be manually created in the namespace
+    ##
+    tls: 
+      - secretName: prometheus-tls
+        hosts:
+          - prometheus.com.br
+
+  prometheuSspec:
+    additionalScrapeConfigs: 
+      - job_name: 'my-app'
+        static_configs:
+          - targets: ['app-comments-app-comments-chart.monitoring-app-teste.svc.cluster.local:8000']
+
+      - job_name: 'kubernetes-pod'
+        kubernetes_sd_configs:
+          - role: pod
